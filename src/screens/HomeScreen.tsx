@@ -54,5 +54,7 @@ const HomeScreen = () => {
             </Content>
         </Container>
         
-    )
-}
+    );
+};
+
+export default HomeScreen;
