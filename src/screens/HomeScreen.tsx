@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { AddButton, ButtonText, Container, Content, Input, ListItem, ListItemText } from "../styles/globalStyles";
-import { HeaderContainer, HeaderImage, HeaderTitle } from "../components/Header";
+import { HeaderContainer, HeaderTitle } from "../components/Header";
 import { Alert, Button, FlatList, Image } from "react-native";
 
 const HomeScreen = () => {
@@ -22,6 +22,10 @@ const HomeScreen = () => {
       
         <Container>
           <HeaderContainer>
+            <Image
+              source={require('../../assets/favicon.png')}
+              style={{ width: 30, height: 30, marginRight: 10 }}
+            />
             <HeaderTitle>Go On - Live for Games</HeaderTitle>
           </HeaderContainer>
     
