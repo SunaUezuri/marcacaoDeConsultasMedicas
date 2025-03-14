@@ -23,7 +23,9 @@ const HomeScreen = () => {
 
 
   const removeItem = (id: string) => {
+    
     setItems(items.filter((item) => item.id !== id));
+
   };
 
   return (
