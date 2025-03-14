@@ -19,39 +19,42 @@ const HomeScreen = () => {
     };
   
     return (
-      <Container>
-        <HeaderContainer>
-          <HeaderTitle>Meu Primeiro App</HeaderTitle>
-        </HeaderContainer>
-  
-        <Content>
-          <Input
-            placeholder="Digite um item"
-            onChangeText={setText}
-            value={text}
-          />
-  
-          <AddButton onPress={addItem}>
-            <ButtonText>Adicionar</ButtonText>
-          </AddButton>
-  
-          <FlatList
-            data={items}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ListItem>
-                <ListItemText>{item.text}</ListItemText>
-              </ListItem>
-            )}
-          />
-  
-          <Button
-            title="Sobre"
-            onPress={() => Alert.alert('Bem-vindo', 'Aplicativo React Native')}
-            color="#6c757d"
-          />
-        </Content>
-      </Container>
+      
+        <Container>
+          <HeaderContainer>
+            <HeaderTitle>Meu Primeiro App</HeaderTitle>
+          </HeaderContainer>
+    
+          <Content>
+            <Input
+              placeholder="Digite um item"
+              onChangeText={setText}
+              value={text}
+            />
+    
+            <AddButton onPress={addItem}>
+              <ButtonText>Adicionar</ButtonText>
+            </AddButton>
+    
+            <FlatList
+              data={items}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <ListItem>
+                  <ListItemText>{item.text}</ListItemText>
+                </ListItem>
+              )}
+            />
+    
+            <Button
+              title="Sobre"
+              onPress={() => Alert.alert('Bem-vindo', 'Aplicativo React Native')}
+              color="#6c757d"
+            />
+          </Content>
+        </Container>
+      
+
     );
   };
 
