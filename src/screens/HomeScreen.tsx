@@ -6,9 +6,9 @@ import { Alert, Button, FlatList, Image } from "react-native";
 const HomeScreen = () => {
     const [text, setText] = useState('');
     const [items, setItems] = useState([
-      { id: '1', text: 'Item 1' },
-      { id: '2', text: 'Item 2' },
-      { id: '3', text: 'Item 3' },
+      { id: '1', text: 'Cadeira Gamer' },
+      { id: '2', text: 'Xbox Series X' },
+      { id: '3', text: 'RTX 4090' },
     ]);
   
     const addItem = () => {
@@ -22,7 +22,7 @@ const HomeScreen = () => {
       
         <Container>
           <HeaderContainer>
-            <HeaderTitle>Meu Primeiro App</HeaderTitle>
+            <HeaderTitle>Go On - Live for Games</HeaderTitle>
           </HeaderContainer>
     
           <Content>
