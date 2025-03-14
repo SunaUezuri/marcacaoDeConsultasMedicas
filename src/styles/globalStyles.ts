@@ -11,8 +11,10 @@ export const Content = styled.View`
 
 export const Input = styled.TextInput`
   height: 40px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
+  border: 3px solid;
+  border-radius: 10px;
+  border-color: green;
+  background-color: #fff;
   margin-bottom: 10px;
   padding: 10px;
 `;

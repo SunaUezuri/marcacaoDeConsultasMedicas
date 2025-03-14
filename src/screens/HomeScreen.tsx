@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { AddButton, ButtonText, Container, Content, Input, ListItem, ListItemText } from "../styles/globalStyles";
-import { HeaderContainer, HeaderTitle } from "../components/Header";
-import { Alert, Button, FlatList } from "react-native";
+import { HeaderContainer, HeaderImage, HeaderTitle } from "../components/Header";
+import { Alert, Button, FlatList, Image } from "react-native";
 
 const HomeScreen = () => {
     const [text, setText] = useState('');
