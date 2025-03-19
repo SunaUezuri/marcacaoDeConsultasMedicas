@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { AddButton, ButtonText, Container, Content, Input, ListItem, ListItemText } from "../styles/globalStyles";
-import { HeaderContainer, HeaderTitle } from "../components/Header";
-import { Alert, Button, FlatList, Image, TouchableOpacity, Switch } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import { Alert, Button, FlatList, Image, Switch, TouchableOpacity } from "react-native";
+import { HeaderContainer, HeaderTitle } from "../components/Header";
+import { AddButton, ButtonText, Container, Content, Input, ListItem, ListItemText } from "../styles/homePageStyles";
 
 const HomeScreen = () => {
   const [text, setText] = useState("");
@@ -23,7 +23,7 @@ const HomeScreen = () => {
 
 
   const removeItem = (id: string) => {
-    
+
     setItems(items.filter((item) => item.id !== id));
 
   };
@@ -71,13 +71,13 @@ const HomeScreen = () => {
           )}
         />
 
-          <Button
-            title="Sobre"
-            onPress={() => Alert.alert('Bem-vindo', 'Aplicativo React Native')}
-            color="#6c757d"
-          />
+        <Button
+          title="Sobre"
+          onPress={() => Alert.alert('Bem-vindo', 'Aplicativo React Native')}
+          color="#6c757d"
+        />
       </Content>
-      
+
     </Container>
   );
 };
