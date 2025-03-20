@@ -1,53 +1,34 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { Alert, Button, FlatList, Image, Switch, TouchableOpacity } from "react-native";
-import { HeaderContainer, HeaderTitle } from "../components/Header";
-import { AddButton, ButtonText, Container, Content, Input, ListItem, ListItemText } from "../styles/homePageStyles";
+import React, { useState } from 'react';
+import { ScrollView, FlatList, Alert, Button } from 'react-native';
+import styled from 'styled-components/native';
+import { HeaderContainer, HeaderTitle } from '../components/Header';
 
 const HomeScreen = () => {
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
   const [items, setItems] = useState([
-    { id: "1", text: "Cadeira Gamer" },
-    { id: "2", text: "Mouse RGB" },
-    { id: "3", text: "Headset HyperX" },
+    { id: '1', text: 'Item 1' },
+    { id: '2', text: 'Item 2' },
+    { id: '3', text: 'Item 3' },
   ]);
-  const [themeDark, setThemeDark] = useState(false);
 
   const addItem = () => {
     if (text.trim()) {
-      const newItem = { id: Date.now().toString(), text };
-      setItems([...items, newItem]);
-      setText("");
+      setItems([...items, { id: Date.now().toString(), text }]);
+      setText('');
     }
   };
 
-
-  const removeItem = (id: string) => {
-
-    setItems(items.filter((item) => item.id !== id));
-
-  };
-
   return (
-    <Container style={{ backgroundColor: themeDark ? "#121212" : "#FFFFFF" }}>
+    <Container>
       <HeaderContainer>
-        <Image
-          source={require("../../assets/favicon.png")}
-          style={{ width: 30, height: 30, marginRight: 10 }}
-        />
-        <HeaderTitle>Go On - Live Game</HeaderTitle>
+        <HeaderTitle>Meu Primeiro App</HeaderTitle>
       </HeaderContainer>
 
       <Content>
-        <Switch
-          value={themeDark}
-          onValueChange={() => setThemeDark(!themeDark)}
-          style={{ marginBottom: 20 }}
-        />
         <Input
-          placeholder="Adicionar item..."
-          value={text}
+          placeholder="Digite um item"
           onChangeText={setText}
+          value={text}
         />
 
         <AddButton onPress={addItem}>
@@ -58,15 +39,8 @@ const HomeScreen = () => {
           data={items}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <ListItem style={{ backgroundColor: themeDark ? "#333" : "#ddd" }}>
-              <TouchableOpacity>
-                <ListItemText>
-                  {item.text}
-                </ListItemText>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => removeItem(item.id)}>
-                <MaterialIcons name="delete" size={20} color="red" />
-              </TouchableOpacity>
+            <ListItem>
+              <ListItemText>{item.text}</ListItemText>
             </ListItem>
           )}
         />
@@ -77,9 +51,49 @@ const HomeScreen = () => {
           color="#6c757d"
         />
       </Content>
-
     </Container>
   );
 };
+
+const Container = styled.ScrollView`
+  flex: 1;
+  background-color: #f8f9fa;
+`;
+
+const Content = styled.View`
+  padding: 20px;
+`;
+
+const Input = styled.TextInput`
+  height: 40px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+`;
+
+const AddButton = styled.TouchableOpacity`
+  background-color: #28a745;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  align-items: center;
+`;
+
+const ButtonText = styled.Text`
+  color: white;
+  font-weight: bold;
+`;
+
+const ListItem = styled.View`
+  background-color: white;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+`;
+
+const ListItemText = styled.Text`
+  font-size: 16px;
+`;
 
 export default HomeScreen;
