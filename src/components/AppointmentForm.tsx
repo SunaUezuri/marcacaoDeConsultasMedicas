@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import styled from "styled-components/native";
+import { TouchableOpacity } from "react-native";
 import { Button, Input, Text } from "react-native-elements";
-import { Platform, View, TouchableOpacity } from "react-native";
+import styled from "styled-components/native";
 import theme from "../styles/theme";
 import { Doctor } from "../types/doctors";
-import { Appointment } from "../types/appointments";
 
 const doctors: Doctor[] = [
   {
@@ -78,7 +77,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
 
     if (!match) return false;
 
-    const [day, month, year] = match;
+    const [, day, month, year] = match;
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
     const today = new Date();
@@ -232,7 +231,7 @@ const DoctorList = styled.ScrollView`
   margin-bottom: ${theme.spacing.large}px;
 `;
 
-const DoctorCard = styled(TouchableOpacity)<{ selected: boolean }>`
+const DoctorCard = styled(TouchableOpacity) <{ selected: boolean }>`
   flex-direction: row;
   align-items: center;
   padding: ${theme.spacing.medium}px;
@@ -286,7 +285,7 @@ const TimeSlotsGrid = styled.View`
   gap: ${theme.spacing.small}px;
 `;
 
-const TimeSlotButton = styled(TouchableOpacity)<{
+const TimeSlotButton = styled(TouchableOpacity) <{
   selected: boolean;
   disabled: boolean;
 }>`
@@ -294,8 +293,8 @@ const TimeSlotButton = styled(TouchableOpacity)<{
     props.disabled
       ? theme.colors.background
       : props.selected
-      ? theme.colors.primary
-      : theme.colors.white};
+        ? theme.colors.primary
+        : theme.colors.white};
   padding: ${theme.spacing.small}px ${theme.spacing.medium}px;
   border-radius: 8px;
   border-width: 1px;
@@ -303,19 +302,19 @@ const TimeSlotButton = styled(TouchableOpacity)<{
     props.disabled
       ? theme.colors.background
       : props.selected
-      ? theme.colors.primary
-      : theme.colors.text};
+        ? theme.colors.primary
+        : theme.colors.text};
   opacity: ${(props: { disabled: boolean }) => (props.disabled ? 0.5 : 1)};
 `;
 
-const TimeSlotText = styled(Text)<{ selected: boolean; disabled: boolean }>`
+const TimeSlotText = styled(Text) <{ selected: boolean; disabled: boolean }>`
   font-size: ${theme.typography.body.fontSize}px;
   color: ${(props: { selected: boolean; disabled: boolean }) =>
     props.disabled
       ? theme.colors.text
       : props.selected
-      ? theme.colors.white
-      : theme.colors.text};
+        ? theme.colors.white
+        : theme.colors.text};
 `;
 
 const InputContainer = {
