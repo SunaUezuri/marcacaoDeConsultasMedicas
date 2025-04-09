@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, LoginCredentials, RegisterData, AuthResponse } from '../types/auth';
+import { AuthResponse, LoginCredentials, RegisterData, User } from '../types/auth';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -104,9 +104,8 @@ export const authService = {
       name: data.name,
       email: data.email,
       role: 'patient' as const,
-      image: `https://randomuser.me/api/portraits/${registeredUsers.length % 2 === 0 ? 'men' : 'women'}/${
-        registeredUsers.length + 1
-      }.jpg`,
+      image: `https://randomuser.me/api/portraits/${registeredUsers.length % 2 === 0 ? 'men' : 'women'}/${registeredUsers.length + 1
+        }.jpg`,
       password: data.password,
     };
 
