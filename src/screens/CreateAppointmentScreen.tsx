@@ -19,6 +19,7 @@ type CreateAppointmentScreenProps = {
 interface Appointment {
   id: string;
   patientId: string;
+  patientName: string;
   doctorId: string;
   doctorName: string;
   date: string;
@@ -95,6 +96,7 @@ const CreateAppointmentScreen: React.FC = () => {
       const newAppointment: Appointment = {
         id: Date.now().toString(),
         patientId: user?.id || '',
+        patientName: user?.name || '',
         doctorId: selectedDoctor.id,
         doctorName: selectedDoctor.name,
         date,
