@@ -7,6 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
+import StatisticsCard from '../components/StatisticsCard';
+import { statisticsService, Statistics } from '../services/statistics';
 import theme from '../styles/theme';
 import Header from '../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -58,6 +60,8 @@ const DoctorDashboardScreen: React.FC = () => {
   const navigation = useNavigation<DoctorDashboardScreenProps['navigation']>();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [statistics, setStatistics] = useState<Statistics | null>(null);
 
   const loadAppointments = async () => {
     try {

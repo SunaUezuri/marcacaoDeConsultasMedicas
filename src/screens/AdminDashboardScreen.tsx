@@ -6,7 +6,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
-import { RootStackParamList } from '../types/navigation';
+import { RootStackParamList } from '../types/navigation'; 
+import StatisticsCard from '../components/StatisticsCard';
+import { statisticsService, Statistics } from '../services/statistics';
 import theme from '../styles/theme';
 import Header from '../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -66,6 +68,8 @@ const AdminDashboardScreen: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
+    const [statistics, setStatistics] = useState<Statistics | null>(null);
+
   const loadData = async () => {
     try {
       // Carrega consultas
@@ -86,6 +90,10 @@ const AdminDashboardScreen: React.FC = () => {
     } finally {
       setLoading(false);
     }
+
+      // Carrega estatísticas
+      const stats = await statisticsService.getGeneralStatistics();
+      setStatistics(stats);
   };
 
   // Carrega os dados quando a tela estiver em foco
@@ -133,6 +141,52 @@ const AdminDashboardScreen: React.FC = () => {
           containerStyle={styles.button as ViewStyle}
           buttonStyle={styles.buttonStyle}
         />
+
+        <SectionTitle>Estatísticas Gerais</SectionTitle>
+        {statistics && (
+          <StatisticsGrid>
+            <StatisticsCard
+              title="Total de Consultas"
+              value={statistics.totalAppointments}
+              color={theme.colors.primary}
+              subtitle="Todas as consultas"
+            />
+            <StatisticsCard
+              title="Consultas Confirmadas"
+              value={statistics.confirmedAppointments}
+              color={theme.colors.success}
+              subtitle={`${statistics.statusPercentages.confirmed.toFixed(1)}% do total`}
+            />
+            <StatisticsCard
+              title="Pacientes Ativos"
+              value={statistics.totalPatients}
+              color={theme.colors.secondary}
+              subtitle="Pacientes únicos"
+            />
+            <StatisticsCard
+              title="Médicos Ativos"
+              value={statistics.totalDoctors}
+              color={theme.colors.warning}
+              subtitle="Médicos com consultas"
+            />
+          </StatisticsGrid>
+        )}
+
+        <SectionTitle>Especialidades Mais Procuradas</SectionTitle>
+        {statistics && Object.entries(statistics.specialties).length > 0 && (
+          <SpecialtyContainer>
+            {Object.entries(statistics.specialties)
+              .sort(([,a], [,b]) => b - a)
+              .slice(0, 3)
+              .map(([specialty, count]) => (
+                <SpecialtyItem key={specialty}>
+                  <SpecialtyName>{specialty}</SpecialtyName>
+                  <SpecialtyCount>{count} consultas</SpecialtyCount>
+                </SpecialtyItem>
+              ))
+            }
+          </SpecialtyContainer>
+        )}
 
         <SectionTitle>Últimas Consultas</SectionTitle>
         {loading ? (
@@ -296,6 +350,43 @@ const ButtonContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin-top: 8px;
+`;
+
+const StatisticsGrid = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
+`;
+
+const SpecialtyContainer = styled.View`
+  background-color: ${theme.colors.white};
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-width: 1px;
+  border-color: ${theme.colors.border};
+`;
+
+const SpecialtyItem = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom-width: 1px;
+  border-bottom-color: ${theme.colors.border}20;
+`;
+
+const SpecialtyName = styled.Text`
+  font-size: 16px;
+  font-weight: 500;
+  color: ${theme.colors.text};
+`;
+
+const SpecialtyCount = styled.Text`
+  font-size: 14px;
+  color: ${theme.colors.primary};
+  font-weight: 600;
 `;
 
 export default AdminDashboardScreen;
