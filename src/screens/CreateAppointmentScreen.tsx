@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { notificationService } from '../services/notifications';
 import theme from '../styles/theme';
 import Header from '../components/Header';
 import DoctorList from '../components/DoctorList';
@@ -110,6 +111,9 @@ const CreateAppointmentScreen: React.FC = () => {
 
       // Salva lista atualizada
       await AsyncStorage.setItem('@MedicalApp:appointments', JSON.stringify(appointments));
+
+      // Envia notificação para o médico
+      await notificationService.notifyNewAppointment(selectedDoctor.id, newAppointment);
 
       alert('Consulta agendada com sucesso!');
       navigation.goBack();
