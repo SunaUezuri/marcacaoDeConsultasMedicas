@@ -85,15 +85,19 @@ const AdminDashboardScreen: React.FC = () => {
         const allUsers: User[] = JSON.parse(storedUsers);
         setUsers(allUsers);
       }
+
+      // Carrega estatísticas
+      const stats = await statisticsService.getGeneralStatistics();
+      setStatistics(stats);
+
+
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
     } finally {
       setLoading(false);
     }
 
-      // Carrega estatísticas
-      const stats = await statisticsService.getGeneralStatistics();
-      setStatistics(stats);
+
   };
 
   // Carrega os dados quando a tela estiver em foco

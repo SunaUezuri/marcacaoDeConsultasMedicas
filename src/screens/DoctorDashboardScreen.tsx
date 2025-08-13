@@ -73,8 +73,15 @@ const DoctorDashboardScreen: React.FC = () => {
         );
         setAppointments(doctorAppointments);
       }
+
+    // Carrega estatísticas do médico
+    if (user?.id) {
+      const stats = await statisticsService.getDoctorStatistics(user.id);
+      setStatistics(stats);
+    }
+
     } catch (error) {
-      console.error('Erro ao carregar consultas:', error);
+      console.error('Erro ao carregar os dados:', error);
     } finally {
       setLoading(false);
     }
@@ -118,6 +125,37 @@ const DoctorDashboardScreen: React.FC = () => {
           containerStyle={styles.button as ViewStyle}
           buttonStyle={styles.buttonStyle}
         />
+
+        <SectionTitle>Minhas Estatísticas</SectionTitle>
+          {statistics && (
+            <StatisticsGrid>
+              <StatisticsCard
+                title="Total de Consultas"
+                value={statistics.totalAppointments || 0}
+                color={theme.colors.primary}
+                subtitle="Consultas registradas"
+              />
+              <StatisticsCard
+                title="Consultas Confirmadas"
+                value={statistics.confirmedAppointments || 0}
+                color={theme.colors.success}
+                subtitle={`${statistics.statusPercentages?.confirmed?.toFixed(1) || 0}% do total`}
+              />
+              <StatisticsCard
+                title="Consultas Pendentes"
+                value={statistics.pendingAppointments || 0}
+                color={theme.colors.warning}
+                subtitle={`${statistics.statusPercentages?.pending?.toFixed(1) || 0}% do total`}
+              />
+              <StatisticsCard
+                title="Pacientes Atendidos"
+                value={statistics.totalPatients || 0}
+                color={theme.colors.secondary}
+                subtitle="Pacientes únicos"
+              />
+            </StatisticsGrid>
+          )}
+
 
         {loading ? (
           <LoadingText>Carregando consultas...</LoadingText>
@@ -272,6 +310,21 @@ const ButtonContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin-top: 8px;
+`;
+
+const SectionTitle = styled.Text`
+  font-size: 20px;
+  font-weight: bold;
+  color: ${theme.colors.text};
+  margin-bottom: 15px;
+  margin-top: 10px;
+`;
+
+const StatisticsGrid = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
 `;
 
 export default DoctorDashboardScreen;
