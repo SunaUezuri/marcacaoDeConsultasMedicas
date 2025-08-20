@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/auth';
+import { imageService } from '../services/imageService';
 import { User, LoginCredentials, RegisterData, AuthContextData } from '../types/auth';
 
 // Chaves de armazenamento
@@ -24,6 +25,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const storedUser = await authService.getStoredUser();
       if (storedUser) {
+        // Tenta carregar a imagem de perfil salva localmente
+        const savedImage = await imageService.getUserProfileImage(storedUser.id);
+        if (savedImage) {
+          storedUser.image = savedImage;
+        }
         setUser(storedUser);
       }
     } catch (error) {
@@ -44,6 +50,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (credentials: LoginCredentials) => {
     try {
       const response = await authService.signIn(credentials);
+      
+      // Tenta carregar a imagem de perfil salva localmente
+      const savedImage = await imageService.getUserProfileImage(response.user.id);
+      if (savedImage) {
+        response.user.image = savedImage;
+      }
+      
       setUser(response.user);
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
       await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
@@ -74,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-    const updateUser = async (updatedUser: User) => {
+  const updateUser = async (updatedUser: User) => {
     try {
       setUser(updatedUser);
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
