@@ -1,90 +1,44 @@
 import React, { useState } from 'react';
-import { Alert, ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components/native';
-import { Ionicons } from '@expo/vector-icons';
-import { imageService, ImageResult } from '../services/imageService';
+import { ScrollView, ViewStyle, Alert } from 'react-native';
+import { Button, Input } from 'react-native-elements';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 import theme from '../styles/theme';
+import Header from '../components/Header';
+import ProfileImagePicker from '../components/ProfileImagePicker';
+import { imageService } from '../services/imageService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface ProfileImagePickerProps {
-  currentImageUri?: string;
-  onImageSelected: (imageUri: string) => void;
-  size?: number;
-  editable?: boolean;
-}
+type EditProfileScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
+};
 
-const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({
-  currentImageUri,
-  onImageSelected,
-  size = 120,
-  editable = true,
-}) => {
+const EditProfileScreen: React.FC = () => {
+  const { user, updateUser } = useAuth();
+  const navigation = useNavigation<EditProfileScreenProps['navigation']>();
+  
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [specialty, setSpecialty] = useState(user?.specialty || '');
+  const [profileImage, setProfileImage] = useState(user?.image || '');
   const [loading, setLoading] = useState(false);
 
-  const showImageOptions = () => {
-    Alert.alert(
-      'Alterar Foto de Perfil',
-      'Como você gostaria de alterar sua foto?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Galeria',
-          onPress: pickFromGallery,
-        },
-        {
-          text: 'Câmera',
-          onPress: takePhoto,
-        },
-        ...(currentImageUri && !currentImageUri.includes('placeholder') ? [{
-          text: 'Remover Foto',
-          style: 'destructive' as const,
-          onPress: removePhoto,
-        }] : []),
-      ]
-    );
-  };
-
-  const pickFromGallery = async () => {
+  const handleImageSelected = async (imageUri: string) => {
     try {
-      setLoading(true);
-      const result = await imageService.pickImageFromGallery();
+      setProfileImage(imageUri);
       
-      if (result) {
-        await handleImageResult(result);
-      }
-    } catch (error) {
-      console.error('Erro ao selecionar imagem:', error);
-      Alert.alert('Erro', 'Não foi possível selecionar a imagem da galeria');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const takePhoto = async () => {
-    try {
-      setLoading(true);
-      const result = await imageService.takePhoto();
-      
-      if (result) {
-        await handleImageResult(result);
-      }
-    } catch (error) {
-      console.error('Erro ao capturar foto:', error);
-      Alert.alert('Erro', 'Não foi possível capturar a foto');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleImageResult = async (result: ImageResult) => {
-    try {
-      if (result.base64) {
-        const base64Uri = `data:image/jpeg;base64,${result.base64}`;
-        onImageSelected(base64Uri);
-      } else {
-        onImageSelected(result.uri);
+      // Salva a imagem no armazenamento local se for uma nova imagem
+      if (imageUri.startsWith('data:image/') && user?.id) {
+        const savedImageUri = await imageService.saveProfileImage(user.id, {
+          uri: imageUri,
+          base64: imageUri.split(',')[1],
+          width: 150,
+          height: 150,
+        });
+        setProfileImage(savedImageUri);
       }
     } catch (error) {
       console.error('Erro ao processar imagem:', error);
@@ -92,120 +46,178 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({
     }
   };
 
-  const removePhoto = () => {
-    Alert.alert(
-      'Remover Foto',
-      'Tem certeza que deseja remover sua foto de perfil?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Remover',
-          style: 'destructive',
-          onPress: () => {
-            onImageSelected(imageService.getPlaceholderImage());
-          },
-        },
-      ]
-    );
-  };
+  const handleSaveProfile = async () => {
+    try {
+      setLoading(true);
 
-  const getImageSource = () => {
-    if (currentImageUri && imageService.validateImageUri(currentImageUri)) {
-      return { uri: currentImageUri };
+      if (!name.trim() || !email.trim()) {
+        Alert.alert('Erro', 'Nome e email são obrigatórios');
+        return;
+      }
+
+      const updatedUser = {
+        ...user!,
+        name: name.trim(),
+        email: email.trim(),
+        image: profileImage,
+        ...(user?.role === 'doctor' && { specialty: specialty.trim() }),
+      };
+
+      // Atualiza no Context
+      await updateUser(updatedUser);
+
+      // Salva no AsyncStorage
+      await AsyncStorage.setItem('@MedicalApp:user', JSON.stringify(updatedUser));
+
+      // Limpeza de imagens antigas
+      if (user?.id) {
+        await imageService.cleanupOldImages(user.id);
+      }
+
+      Alert.alert('Sucesso', 'Perfil atualizado com sucesso!', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
+
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível atualizar o perfil');
+      console.error('Erro ao atualizar perfil:', error);
+    } finally {
+      setLoading(false);
     }
-    return { uri: imageService.getPlaceholderImage() };
   };
 
   return (
     <Container>
-      <ImageContainer size={size}>
-        <ProfileImage 
-          source={getImageSource()}
-          size={size}
-        />
-        
-        {loading && (
-          <LoadingOverlay size={size}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-          </LoadingOverlay>
-        )}
-        
-        {editable && (
-          <EditButton onPress={showImageOptions} disabled={loading}>
-            <Ionicons 
-              name="camera" 
-              size={20} 
-              color={theme.colors.white} 
+      <Header />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Title>Editar Perfil</Title>
+
+        <ProfileCard>
+          <ProfileImagePicker
+            currentImageUri={profileImage}
+            onImageSelected={handleImageSelected}
+            size={120}
+            editable={true}
+          />
+          
+          <Input
+            label="Nome"
+            value={name}
+            onChangeText={setName}
+            containerStyle={styles.input}
+            placeholder="Digite seu nome"
+          />
+
+          <Input
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            containerStyle={styles.input}
+            placeholder="Digite seu email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          {user?.role === 'doctor' && (
+            <Input
+              label="Especialidade"
+              value={specialty}
+              onChangeText={setSpecialty}
+              containerStyle={styles.input}
+              placeholder="Digite sua especialidade"
             />
-          </EditButton>
-        )}
-      </ImageContainer>
-      
-      {editable && (
-        <ChangePhotoText>Toque no ícone para alterar</ChangePhotoText>
-      )}
+          )}
+
+          <RoleBadge role={user?.role || ''}>
+            <RoleText>{user?.role === 'admin' ? 'Administrador' : user?.role === 'doctor' ? 'Médico' : 'Paciente'}</RoleText>
+          </RoleBadge>
+        </ProfileCard>
+
+        <Button
+          title="Salvar Alterações"
+          onPress={handleSaveProfile}
+          loading={loading}
+          containerStyle={styles.button as ViewStyle}
+          buttonStyle={styles.saveButton}
+        />
+
+        <Button
+          title="Cancelar"
+          onPress={() => navigation.goBack()}
+          containerStyle={styles.button as ViewStyle}
+          buttonStyle={styles.cancelButton}
+        />
+      </ScrollView>
     </Container>
   );
 };
 
+const styles = {
+  scrollContent: {
+    padding: 20,
+  },
+  input: {
+    marginBottom: 15,
+  },
+  button: {
+    marginBottom: 15,
+    width: '100%',
+  },
+  saveButton: {
+    backgroundColor: theme.colors.success,
+    paddingVertical: 12,
+  },
+  cancelButton: {
+    backgroundColor: theme.colors.secondary,
+    paddingVertical: 12,
+  },
+};
+
 const Container = styled.View`
-  align-items: center;
-  margin-bottom: 16px;
+  flex: 1;
+  background-color: ${theme.colors.background};
 `;
 
-const ImageContainer = styled.View<{ size: number }>`
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  position: relative;
-`;
-
-const ProfileImage = styled.Image<{ size: number }>`
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  border-radius: ${props => props.size / 2}px;
-  border-width: 3px;
-  border-color: ${theme.colors.primary};
-`;
-
-const LoadingOverlay = styled.View<{ size: number }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  border-radius: ${props => props.size / 2}px;
-  background-color: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-`;
-
-const EditButton = styled.TouchableOpacity`
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 18px;
-  background-color: ${theme.colors.primary};
-  justify-content: center;
-  align-items: center;
-  border-width: 2px;
-  border-color: ${theme.colors.white};
-  shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.25;
-  shadow-radius: 3.84px;
-  elevation: 5;
-`;
-
-const ChangePhotoText = styled.Text`
-  font-size: 12px;
-  color: ${theme.colors.textSecondary};
-  margin-top: 8px;
+const Title = styled.Text`
+  font-size: 24px;
+  font-weight: bold;
+  color: ${theme.colors.text};
+  margin-bottom: 20px;
   text-align: center;
 `;
 
-export default ProfileImagePicker;
+const ProfileCard = styled.View`
+  background-color: ${theme.colors.white};
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  align-items: center;
+  border-width: 1px;
+  border-color: ${theme.colors.border};
+`;
+
+// Avatar removido - agora usamos o ProfileImagePicker
+
+const RoleBadge = styled.View<{ role: string }>`
+  background-color: ${(props: { role: string }) => {
+    switch (props.role) {
+      case 'admin':
+        return theme.colors.primary + '20';
+      case 'doctor':
+        return theme.colors.success + '20';
+      default:
+        return theme.colors.secondary + '20';
+    }
+  }};
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-top: 10px;
+`;
+
+const RoleText = styled.Text`
+  color: ${theme.colors.text};
+  font-size: 14px;
+  font-weight: 500;
+`;
+
+export default EditProfileScreen;
