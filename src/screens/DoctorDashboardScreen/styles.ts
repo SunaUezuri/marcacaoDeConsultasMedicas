@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 import { FlatList } from 'react-native';
 import theme from '../../styles/theme';
-import { StyledProps } from './types';
+import { StyledProps } from './types/types';
 import { getStatusColor } from './utils/statusUtils';
 import { ListItem } from 'react-native-elements';
 

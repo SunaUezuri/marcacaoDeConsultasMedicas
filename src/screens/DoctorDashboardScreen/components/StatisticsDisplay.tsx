@@ -5,7 +5,7 @@ import { Statistics } from '../../../services/statistics';
 import StatisticsCard from '../../../components/StatisticsCard';
 import theme from '../../../styles/theme';
 import { SectionTitle, StatisticsGrid } from '../../AdminDashBoardScreen/styles';
-import { StatisticsDisplayProps } from '../types';
+import { StatisticsDisplayProps } from '../types/types';
 
 
 const StatisticsDisplay: React.FC<StatisticsDisplayProps> = ({ statistics }) => {
