@@ -1,5 +1,3 @@
-// src/screens/DoctorDashboard/components/AppointmentCardItem.tsx
-
 import React from 'react';
 import { ViewStyle, TextStyle } from 'react-native';
 import { Button, ListItem, Text } from 'react-native-elements';

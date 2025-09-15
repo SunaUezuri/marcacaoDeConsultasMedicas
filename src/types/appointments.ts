@@ -21,7 +21,7 @@ export interface Appointment {
   doctorName: string;
   date: string;
   time: string;
-  description: string;
+  description?: string;
   specialty: string;
   status: 'pending' | 'confirmed' | 'cancelled';
 }

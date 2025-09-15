@@ -1,7 +1,4 @@
-// src/screens/DoctorDashboard/components/StatisticsDisplay.tsx
-
 import React from 'react';
-import { Statistics } from '../../../services/statistics';
 import StatisticsCard from '../../../components/StatisticsCard';
 import theme from '../../../styles/theme';
 import { SectionTitle, StatisticsGrid } from '../../AdminDashBoardScreen/styles';
