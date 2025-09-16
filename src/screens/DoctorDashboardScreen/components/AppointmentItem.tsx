@@ -1,9 +1,9 @@
 import React from 'react';
 import { ViewStyle, TextStyle } from 'react-native';
 import { Button, ListItem, Text } from 'react-native-elements';
-import { getStatusColor, getStatusText } from '../utils/statusUtils';
 import { AppointmentCard, ButtonContainer, StatusBadge, StatusText, stylesItem } from '../styles';
 import { AppointmentCardItemProps } from '../types/types';
+import { getStatusText } from '../../../utils/statusUtils';
 
 const AppointmentCardItem: React.FC<AppointmentCardItemProps> = ({ appointment, onAction }) => {
   return (

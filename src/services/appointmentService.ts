@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Appointment } from '../../../types/appointments';
+import { Appointment } from '../types/appointments';
 
 const APPOINTMENTS_STORAGE_KEY = '@MedicalApp:appointments';
 
@@ -20,6 +20,25 @@ const createAppointment = async (newAppointment: Appointment): Promise<void> => 
   }
 };
 
+/**
+ * Busca todos os agendamentos de um paciente específico.
+ */
+const getPatientAppointments = async (patientId: string): Promise<Appointment[]> => {
+  try {
+    const storedAppointments = await AsyncStorage.getItem(APPOINTMENTS_STORAGE_KEY);
+    if (storedAppointments) {
+      const allAppointments: Appointment[] = JSON.parse(storedAppointments);
+      // Filtra os agendamentos pelo ID do paciente
+      return allAppointments.filter(app => app.patientId === patientId);
+    }
+    return [];
+  } catch (error) {
+    console.error('Erro ao carregar agendamentos do paciente:', error);
+    return [];
+  }
+};
+
 export const appointmentService = {
   createAppointment,
+  getPatientAppointments,
 };

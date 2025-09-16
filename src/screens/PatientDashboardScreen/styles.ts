@@ -1,42 +1,48 @@
 import styled from 'styled-components/native';
+import { ListItem } from 'react-native-elements';
 import theme from '../../styles/theme';
 import { getStatusColor } from '../../utils/statusUtils';
-import { ListItem } from 'react-native-elements';
 import { StyledProps } from '../../types/style';
 
 export const styles = {
+  scrollContent: {
+    padding: 20,
+  },
   button: {
-    marginVertical: 8,
-    marginHorizontal: 16,
+    marginBottom: 20,
+    width: '100%',
   },
   buttonStyle: {
-    backgroundColor: '#1976d2',
-  },
-  settingsButton: {
-    backgroundColor: '#388e3c',
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 12,
   },
   logoutButton: {
-    backgroundColor: '#d32f2f',
+    backgroundColor: theme.colors.error,
+    paddingVertical: 12,
   },
-  scrollContent: {
-    paddingBottom: 24,
+  doctorName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.text,
   },
-};
-
-export const stylesItem = {
-  patientName: { fontSize: 16, fontWeight: '700', color: theme.colors.text },
-  dateTime: { fontSize: 16, fontWeight: '700', color: theme.colors.text },
-  specialty: { fontSize: 14, fontWeight: '500', color: theme.colors.text },
-  actionButton: { 
-    width: '48%',
+  patientName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
   },
-  confirmButton: { 
-    backgroundColor: theme.colors.success, 
-    paddingVertical: 8 
+  specialty: {
+    fontSize: 14,
+    color: theme.colors.text,
+    marginTop: 4,
   },
-  cancelButton: { 
-    backgroundColor: theme.colors.error, 
-    paddingVertical: 8 
+  dateTime: {
+    fontSize: 14,
+    color: theme.colors.text,
+    marginTop: 4,
+  },
+    settingsButton: {
+    backgroundColor: theme.colors.secondary,
+    paddingVertical: 12,
   },
 };
 
@@ -88,25 +94,4 @@ export const StatusText = styled.Text<StyledProps>`
   color: ${(props: StyledProps) => getStatusColor(props.status)};
   font-size: 12px;
   font-weight: 500;
-`;
-
-export const ButtonContainer = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: 8px;
-`;
-
-export const SectionTitle = styled.Text`
-  font-size: 20px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 15px;
-  margin-top: 10px;
-`;
-
-export const StatisticsGrid = styled.View`
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin-bottom: 20px;
 `;

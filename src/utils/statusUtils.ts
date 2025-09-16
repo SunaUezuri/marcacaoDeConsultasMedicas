@@ -1,4 +1,4 @@
-import theme from '../../../styles/theme';
+import theme from "../styles/theme";
 
 export const getStatusColor = (status: string): string => {
   switch (status) {

@@ -9,7 +9,3 @@ export interface AppointmentCardItemProps {
   appointment: Appointment;
   onAction: (appointment: Appointment, action: 'confirm' | 'cancel') => void;
 }
-
-export interface StyledProps {
-  status: string;
-}

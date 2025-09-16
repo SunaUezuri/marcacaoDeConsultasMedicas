@@ -5,7 +5,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { RootStackParamList } from '../../../types/navigation';
 import { notificationService } from '../../../services/notifications';
 import { Appointment } from '../../../types/appointments';
-import { appointmentService } from '../services/appointmentService';
+import { appointmentService } from '../../../services/appointmentService';
 import { Doctor } from '../types/types';
 type NavigationProps = NativeStackNavigationProp<RootStackParamList, 'CreateAppointment'>;
 
