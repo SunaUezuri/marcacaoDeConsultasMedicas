@@ -49,14 +49,15 @@ Esta é uma aplicação mobile completa desenvolvida em **React Native** com **E
 ### **Estrutura de Pastas**
 ```
 src/
-├── components/          # Componentes reutilizáveis da UI
+├── components/         # Componentes reutilizáveis da UI
 ├── contexts/           # Contextos React (Auth, etc.)
 ├── navigation/         # Configuração de navegação
 ├── routes/             # Definição de rotas
 ├── screens/            # Telas da aplicação
 ├── services/           # Serviços e lógica de negócio
 ├── styles/             # Estilos globais e tema
-└── types/              # Definições de tipos TypeScript
+├── types/              # Definições de tipos TypeScript
+└── utils/              # Arquivos de utilitários
 ```
 
 ### **Padrões de Desenvolvimento**
@@ -65,6 +66,7 @@ src/
 - **Context API**: Gerenciamento de estado global
 - **React Navigation**: Sistema de navegação robusto
 - **AsyncStorage**: Persistência local de dados
+- **Clean Code**: Organização e manutenabilidade
 
 ## 🛠️ Tecnologias Utilizadas
 
