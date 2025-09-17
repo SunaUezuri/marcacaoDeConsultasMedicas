@@ -1,4 +1,3 @@
-// src/screens/AdminDashBoardScreen/styles.ts
 import styled from 'styled-components/native';
 import { ScrollView } from 'react-native';
 import theme from '../../styles/theme';

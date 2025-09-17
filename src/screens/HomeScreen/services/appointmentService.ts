@@ -1,4 +1,3 @@
-// src/screens/HomeScreen/services/appointmentService.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Appointment } from '../../../types/appointments';
 

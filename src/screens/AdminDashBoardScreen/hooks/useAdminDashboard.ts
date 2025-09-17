@@ -1,27 +1,9 @@
-// src/screens/AdminDashBoardScreen/hooks/useAdminDashboard.ts
 import { useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import React from 'react';
 import { AdminDashboardService } from '../services/adminDashboardService';
 import { Statistics } from '../../../services/statistics';
-
-interface Appointment {
-  id: string;
-  patientId: string;
-  doctorId: string;
-  doctorName: string;
-  date: string;
-  time: string;
-  specialty: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'doctor' | 'patient';
-}
+import { Appointment, User } from '../types/types';
 
 export const useAdminDashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);

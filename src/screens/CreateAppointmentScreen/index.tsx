@@ -2,11 +2,9 @@ import React from 'react';
 import { ScrollView, ViewStyle } from 'react-native';
 import { Button, Input } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
-
 import Header from '../../components/Header';
 import DoctorList from '../../components/DoctorList';
 import TimeSlotList from '../../components/TimeSlotList';
-
 import { useCreateAppointment } from './hooks/useCreateAppointment';
 import { Container, Title, SectionTitle, ErrorText, styles } from './styles';
 import { availableDoctors } from './models/doctors';

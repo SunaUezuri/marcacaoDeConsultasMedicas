@@ -1,30 +1,6 @@
-// src/screens/AdminDashBoardScreen/services/adminDashboardService.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { statisticsService, Statistics } from '../../../services/statistics';
-
-interface Appointment {
-  id: string;
-  patientId: string;
-  doctorId: string;
-  doctorName: string;
-  date: string;
-  time: string;
-  specialty: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'doctor' | 'patient';
-}
-
-interface DashboardData {
-  appointments: Appointment[];
-  users: User[];
-  statistics: Statistics;
-}
+import { DashboardData, Appointment, User } from '../types/types';
 
 export class AdminDashboardService {
   private static readonly APPOINTMENTS_STORAGE_KEY = '@MedicalApp:appointments';

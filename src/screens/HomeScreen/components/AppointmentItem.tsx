@@ -1,7 +1,5 @@
-// src/screens/HomeScreen/components/AppointmentItem.tsx
 import React from 'react';
 import { Icon } from 'react-native-elements';
-import { Appointment } from '../../../types/appointments';
 import { getDoctorInfo } from '../models/doctors';
 import theme from '../../../styles/theme';
 import {
@@ -16,12 +14,9 @@ import {
   ActionButtons,
   ActionButton,
 } from '../styles';
+import { AppointmentItemProps } from '../types/types';
 
-interface AppointmentItemProps {
-  appointment: Appointment;
-  onEdit?: (appointment: Appointment) => void;
-  onDelete?: (appointmentId: string) => void;
-}
+
 
 export const AppointmentItem: React.FC<AppointmentItemProps> = ({
   appointment,

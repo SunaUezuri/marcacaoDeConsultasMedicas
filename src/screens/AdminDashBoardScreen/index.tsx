@@ -1,7 +1,4 @@
-// src/screens/AdminDashBoardScreen/index.tsx
 import React from 'react';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../types/navigation';
 import { useAdminDashboard } from './hooks/useAdminDashboard';
 import { StatisticsSection } from './components/StatisticsSection';
 import { AppointmentList } from './components/AppointmentList';
@@ -11,10 +8,7 @@ import {
   ScrollContent,
   Title,
 } from './styles';
-
-type AdminDashboardScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'AdminDashboard'>;
-};
+import { AdminDashboardScreenProps } from './types/types';
 
 const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation }) => {
   const {

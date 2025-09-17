@@ -1,16 +1,9 @@
-// src/screens/AdminDashBoardScreen/components/ActionButtons.tsx
 import React from 'react';
 import { Button } from 'react-native-elements';
 import { ViewStyle } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../../types/navigation';
 import { useAuth } from '../../../contexts/AuthContext';
-
-
-type AdminDashboardScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'AdminDashboard'>;
-};
+import { AdminDashboardScreenProps } from '../types/types';
 
 export const ActionButtons: React.FC = () => {
   const navigation = useNavigation<AdminDashboardScreenProps['navigation']>();

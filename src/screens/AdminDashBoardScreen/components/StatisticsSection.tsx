@@ -1,6 +1,4 @@
-// src/screens/AdminDashBoardScreen/components/StatisticsSection.tsx
 import React from 'react';
-import { Statistics } from '../../../services/statistics';
 import StatisticsCard from '../../../components/StatisticsCard';
 import theme from '../../../styles/theme';
 import {
@@ -11,10 +9,7 @@ import {
   SpecialtyName,
   SpecialtyCount,
 } from '../styles';
-
-interface StatisticsSectionProps {
-  statistics: Statistics;
-}
+import { StatisticsSectionProps } from '../types/types';
 
 export const StatisticsSection: React.FC<StatisticsSectionProps> = ({ statistics }) => {
   return (

@@ -1,4 +1,3 @@
-// src/screens/HomeScreen/hooks/useHomeScreen.ts
 import { useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import React from 'react';

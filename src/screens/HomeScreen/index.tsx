@@ -1,8 +1,5 @@
-// src/screens/HomeScreen/index.tsx
 import React from 'react';
 import { RefreshControl } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../types/navigation';
 import { Appointment } from '../../types/appointments';
 import { useHomeScreen } from './hooks/useHomeScreen';
 import { AppointmentItem } from './components/AppointmentItem';
@@ -15,10 +12,7 @@ import {
   EmptyText,
 } from './styles';
 import CreateAppointmentButton from './components/CreateAppointmentButton';
-
-type HomeScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
-};
+import { HomeScreenProps } from './types/types';
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const {

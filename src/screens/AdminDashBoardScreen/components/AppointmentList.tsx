@@ -1,4 +1,3 @@
-// src/screens/AdminDashBoardScreen/components/AppointmentList.tsx
 import React from 'react';
 import { Button, ListItem, Text } from 'react-native-elements';
 import { ViewStyle, TextStyle, View } from 'react-native';
@@ -10,45 +9,8 @@ import {
   StatusBadge,
   StatusText,
 } from '../styles';
-
-interface Appointment {
-  id: string;
-  patientId: string;
-  doctorId: string;
-  doctorName: string;
-  date: string;
-  time: string;
-  specialty: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
-}
-
-interface AppointmentListProps {
-  appointments: Appointment[];
-  loading: boolean;
-  onUpdateStatus: (appointmentId: string, newStatus: 'confirmed' | 'cancelled') => void;
-}
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'confirmed':
-      return '#4CAF50';
-    case 'cancelled':
-      return '#F44336';
-    default:
-      return '#FF9800';
-  }
-};
-
-const getStatusText = (status: string) => {
-  switch (status) {
-    case 'confirmed':
-      return 'Confirmada';
-    case 'cancelled':
-      return 'Cancelada';
-    default:
-      return 'Pendente';
-  }
-};
+import { AppointmentListProps } from '../types/types';
+import { getStatusText } from '../../../utils/statusUtils';
 
 export const AppointmentList: React.FC<AppointmentListProps> = ({
   appointments,

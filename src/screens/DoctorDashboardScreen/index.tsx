@@ -12,10 +12,7 @@ import { Title, LoadingText } from '../AdminDashBoardScreen/styles';
 import AppointmentCardItem from './components/AppointmentItem';
 import { useDoctorDashboard } from './hooks/useDoctorDashboardScreen';
 import { Container, EmptyText, styles } from './styles';
-
-type DoctorDashboardScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'DoctorDashboard'>;
-};
+import { DoctorDashboardScreenProps } from './types/types';
 
 const DoctorDashboardScreen: React.FC = () => {
   const { signOut } = useAuth();

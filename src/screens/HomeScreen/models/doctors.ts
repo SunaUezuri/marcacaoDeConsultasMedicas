@@ -1,4 +1,3 @@
-// src/screens/HomeScreen/models/doctors.ts
 import { Doctor } from '../../../types/doctors';
 
 export const mockDoctors: Doctor[] = [
