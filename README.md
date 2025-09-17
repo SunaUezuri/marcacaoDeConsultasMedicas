@@ -7,6 +7,7 @@ Esta é uma aplicação mobile completa desenvolvida em **React Native** com **E
 ## Integrantes
 
 ### **Wesley Sena dos Santos** - **RM**: 558043
+### **Samara Victoria Ferraz dos Santos** - **RM**: 558719
 
 ## 🎯 Principais Funcionalidades
 

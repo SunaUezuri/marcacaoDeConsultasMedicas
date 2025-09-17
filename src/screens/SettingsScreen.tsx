@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
-import styled from 'styled-components/native';
-import { ScrollView, ViewStyle, Alert, Share } from 'react-native';
-import { Button, ListItem, Switch, Text } from 'react-native-elements';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useCallback } from 'react';
+import { ScrollView, View, Text, Alert, Share, ActivityIndicator } from 'react-native';
+import { Button, ListItem, Switch } from 'react-native-elements';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../types/navigation';
-import theme from '../styles/theme';
-import Header from '../components/Header';
 import { storageService } from '../services/storage';
+import Header from '../components/Header';
+import theme from '../styles/theme';
 
 type SettingsScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Settings'>;
@@ -22,9 +20,15 @@ interface AppSettings {
   language: string;
 }
 
+interface StorageInfo {
+  cacheSize: number;
+  totalKeys: number;
+}
+
 const SettingsScreen: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
   const navigation = useNavigation<SettingsScreenProps['navigation']>();
+
   const [settings, setSettings] = useState<AppSettings>({
     notifications: true,
     autoBackup: true,
@@ -32,13 +36,13 @@ const SettingsScreen: React.FC = () => {
     language: 'pt-BR',
   });
   const [loading, setLoading] = useState(true);
-  const [storageInfo, setStorageInfo] = useState<any>(null);
+  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
 
   const loadSettings = async () => {
     try {
-      const appSettings = await storageService.getAppSettings();
-      setSettings(appSettings);
-      
+      const saved = await storageService.getAppSettings();
+      setSettings(saved);
+
       const info = await storageService.getStorageInfo();
       setStorageInfo(info);
     } catch (error) {
@@ -49,18 +53,17 @@ const SettingsScreen: React.FC = () => {
   };
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       loadSettings();
     }, [])
   );
 
   const updateSetting = async (key: keyof AppSettings, value: any) => {
     try {
-      const updatedSettings = { ...settings, [key]: value };
-      setSettings(updatedSettings);
+      const updated = { ...settings, [key]: value };
+      setSettings(updated);
       await storageService.updateAppSettings({ [key]: value });
-    } catch (error) {
-      console.error('Erro ao atualizar configuração:', error);
+    } catch {
       Alert.alert('Erro', 'Não foi possível salvar a configuração');
     }
   };
@@ -69,17 +72,15 @@ const SettingsScreen: React.FC = () => {
     try {
       setLoading(true);
       const backup = await storageService.createBackup();
-      
       const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
-      
+
       await Share.share({
         message: backup,
         title: `Backup do App - ${fileName}`,
       });
-      
+
       Alert.alert('Sucesso', 'Backup criado e compartilhado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao criar backup:', error);
+    } catch {
       Alert.alert('Erro', 'Não foi possível criar o backup');
     } finally {
       setLoading(false);
@@ -87,243 +88,229 @@ const SettingsScreen: React.FC = () => {
   };
 
   const handleClearCache = async () => {
-    Alert.alert(
-      'Limpar Cache',
-      'Isso irá limpar o cache da aplicação. Tem certeza?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Limpar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              storageService.clearCache();
-              await loadSettings();
-              Alert.alert('Sucesso', 'Cache limpo com sucesso!');
-            } catch (error) {
-              Alert.alert('Erro', 'Não foi possível limpar o cache');
-            }
-          },
+    Alert.alert('Limpar Cache', 'Tem certeza que deseja limpar o cache?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Limpar',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await storageService.clearCache();
+            await loadSettings();
+            Alert.alert('Sucesso', 'Cache limpo!');
+          } catch {
+            Alert.alert('Erro', 'Não foi possível limpar o cache');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleClearAllData = async () => {
-    Alert.alert(
-      'Apagar Todos os Dados',
-      'ATENÇÃO: Isso irá apagar TODOS os dados da aplicação permanentemente. Esta ação não pode ser desfeita!',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'APAGAR TUDO',
-          style: 'destructive',
-          onPress: async () => {
-            Alert.alert(
-              'Confirmação Final',
-              'Tem certeza absoluta? Todos os dados serão perdidos!',
-              [
-                { text: 'Cancelar', style: 'cancel' },
-                {
-                  text: 'SIM, APAGAR',
-                  style: 'destructive',
-                  onPress: async () => {
-                    try {
-                      await storageService.clearAll();
-                      Alert.alert('Concluído', 'Todos os dados foram apagados. O app será reiniciado.', [
-                        { text: 'OK', onPress: () => signOut() }
-                      ]);
-                    } catch (error) {
-                      Alert.alert('Erro', 'Não foi possível apagar os dados');
-                    }
-                  },
-                },
-              ]
-            );
-          },
+    Alert.alert('Apagar Todos os Dados', 'Essa ação não pode ser desfeita!', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'APAGAR',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await storageService.clearAll();
+            Alert.alert('Concluído', 'Todos os dados foram apagados.', [
+              { text: 'OK', onPress: () => signOut() },
+            ]);
+          } catch {
+            Alert.alert('Erro', 'Não foi possível apagar os dados');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
+
+  const renderLoading = () => (
+    <View style={stylesSettings.loading}>
+      <ActivityIndicator size="large" color={theme.colors.primary} />
+      <Text style={stylesSettings.loadingText}>Carregando configurações...</Text>
+    </View>
+  );
+
+  const renderPreferences = () => (
+    <View style={stylesSettings.card}>
+      <ListItem>
+        <ListItem.Content>
+          <ListItem.Title>Notificações</ListItem.Title>
+          <ListItem.Subtitle>Receber notificações push</ListItem.Subtitle>
+        </ListItem.Content>
+        <Switch
+          value={settings.notifications}
+          onValueChange={(v) => updateSetting('notifications', v)}
+          trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+        />
+      </ListItem>
+
+      <ListItem>
+        <ListItem.Content>
+          <ListItem.Title>Backup Automático</ListItem.Title>
+          <ListItem.Subtitle>Criar backups automaticamente</ListItem.Subtitle>
+        </ListItem.Content>
+        <Switch
+          value={settings.autoBackup}
+          onValueChange={(v) => updateSetting('autoBackup', v)}
+          trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+        />
+      </ListItem>
+    </View>
+  );
+
+  const renderStorageInfo = () =>
+    storageInfo && (
+      <View style={stylesSettings.card}>
+        <View style={stylesSettings.infoRow}>
+          <Text style={stylesSettings.infoLabel}>Itens no Cache:</Text>
+          <Text style={stylesSettings.infoValue}>{storageInfo.cacheSize}</Text>
+        </View>
+        <View style={stylesSettings.infoRow}>
+          <Text style={stylesSettings.infoLabel}>Total de Chaves:</Text>
+          <Text style={stylesSettings.infoValue}>{storageInfo.totalKeys}</Text>
+        </View>
+      </View>
+    );
 
   if (loading) {
     return (
-      <Container>
+      <View style={stylesSettings.container}>
         <Header />
-        <LoadingContainer>
-          <LoadingText>Carregando configurações...</LoadingText>
-        </LoadingContainer>
-      </Container>
+        {renderLoading()}
+      </View>
     );
   }
 
   return (
-    <Container>
+    <View style={stylesSettings.container}>
       <Header />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Title>Configurações</Title>
+      <ScrollView contentContainerStyle={stylesSettings.scroll}>
+        <Text style={stylesSettings.title}>Configurações</Text>
 
-        <SectionTitle>Preferências</SectionTitle>
-        <SettingsCard>
-          <ListItem>
-            <ListItem.Content>
-              <ListItem.Title>Notificações</ListItem.Title>
-              <ListItem.Subtitle>Receber notificações push</ListItem.Subtitle>
-            </ListItem.Content>
-            <Switch
-              value={settings.notifications}
-              onValueChange={(value) => updateSetting('notifications', value)}
-              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-            />
-          </ListItem>
+        <Text style={stylesSettings.section}>Preferências</Text>
+        {renderPreferences()}
 
-          <ListItem>
-            <ListItem.Content>
-              <ListItem.Title>Backup Automático</ListItem.Title>
-              <ListItem.Subtitle>Criar backups automaticamente</ListItem.Subtitle>
-            </ListItem.Content>
-            <Switch
-              value={settings.autoBackup}
-              onValueChange={(value) => updateSetting('autoBackup', value)}
-              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-            />
-          </ListItem>
-        </SettingsCard>
-
-        <SectionTitle>Dados e Armazenamento</SectionTitle>
-        <SettingsCard>
-          {storageInfo && (
-            <>
-              <InfoItem>
-                <InfoLabel>Itens no Cache:</InfoLabel>
-                <InfoValue>{storageInfo.cacheSize}</InfoValue>
-              </InfoItem>
-              <InfoItem>
-                <InfoLabel>Total de Chaves:</InfoLabel>
-                <InfoValue>{storageInfo.totalKeys}</InfoValue>
-              </InfoItem>
-            </>
-          )}
-        </SettingsCard>
+        <Text style={stylesSettings.section}>Dados e Armazenamento</Text>
+        {renderStorageInfo()}
 
         <Button
           title="Criar Backup"
           onPress={handleCreateBackup}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.backupButton}
+          containerStyle={stylesSettings.button}
+          buttonStyle={stylesSettings.successButton}
           loading={loading}
         />
 
         <Button
           title="Limpar Cache"
           onPress={handleClearCache}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.cacheButton}
+          containerStyle={stylesSettings.button}
+          buttonStyle={stylesSettings.warningButton}
+          loading={loading}
         />
 
-        <SectionTitle>Ações Perigosas</SectionTitle>
+        <Text style={stylesSettings.section}>Ações Perigosas</Text>
         <Button
           title="Apagar Todos os Dados"
           onPress={handleClearAllData}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.dangerButton}
+          containerStyle={stylesSettings.button}
+          buttonStyle={stylesSettings.dangerButton}
+          loading={loading}
         />
 
         <Button
           title="Voltar"
           onPress={() => navigation.goBack()}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
+          containerStyle={stylesSettings.button}
+          buttonStyle={stylesSettings.primaryButton}
         />
       </ScrollView>
-    </Container>
+    </View>
   );
 };
 
-const styles = {
-  scrollContent: {
+const baseButton = {
+  paddingVertical: 12,
+};
+
+const stylesSettings = {
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  scroll: {
     padding: 20,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+  },
+  loadingText: {
+    marginTop: 10,
+    color: theme.colors.text,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold' as const,
+    textAlign: 'center' as const,
+    marginBottom: 20,
+    color: theme.colors.text,
+  },
+  section: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    marginTop: 20,
+    marginBottom: 10,
+    color: theme.colors.text,
+  },
+  card: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  infoRow: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  infoLabel: {
+    fontSize: 16,
+    color: theme.colors.text,
+  },
+  infoValue: {
+    fontSize: 16,
+    fontWeight: 'bold' as const,
+    color: theme.colors.primary,
   },
   button: {
     marginBottom: 15,
     width: '100%',
   },
-  buttonStyle: {
+  primaryButton: {
+    ...baseButton,
     backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
   },
-  backupButton: {
+  successButton: {
+    ...baseButton,
     backgroundColor: theme.colors.success,
-    paddingVertical: 12,
   },
-  cacheButton: {
+  warningButton: {
+    ...baseButton,
     backgroundColor: theme.colors.warning,
-    paddingVertical: 12,
   },
   dangerButton: {
+    ...baseButton,
     backgroundColor: theme.colors.error,
-    paddingVertical: 12,
   },
 };
 
-const Container = styled.View`
-  flex: 1;
-  background-color: ${theme.colors.background};
-`;
-
-const LoadingContainer = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
-
-const LoadingText = styled.Text`
-  font-size: 16px;
-  color: ${theme.colors.text};
-`;
-
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 20px;
-  text-align: center;
-`;
-
-const SectionTitle = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 10px;
-  margin-top: 20px;
-`;
-
-const SettingsCard = styled.View`
-  background-color: ${theme.colors.white};
-  border-radius: 8px;
-  margin-bottom: 15px;
-  border-width: 1px;
-  border-color: ${theme.colors.border};
-`;
-
-const InfoItem = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${theme.colors.border};
-`;
-
-const InfoLabel = styled.Text`
-  font-size: 16px;
-  color: ${theme.colors.text};
-`;
-
-const InfoValue = styled.Text`
-  font-size: 16px;
-  font-weight: bold;
-  color: ${theme.colors.primary};
-`;
-
 export default SettingsScreen;
+
